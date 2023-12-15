@@ -51,6 +51,7 @@ if ($conn->connect_error) {
 
   // Fetch last 3 records
   $sql2 = "SELECT  * FROM `lease_agreement` where created_by = " . $userId . " ORDER BY created_at DESC LIMIT 3" ;
+  //echo $sql2;
   $landlord_last3 = $conn->query($sql2);
 
   // Fetch Agreements to review as Tenant
@@ -165,7 +166,7 @@ $conn->close();
             <table>
               <tr>
                 <td>
-                    <b> <?php echo strtoupper($row['property_postcode']) ?> </b>
+                    <b> <a href="main.php?custom=view_agreement1.php?id=<?php echo strtoupper($row['id']) ?>" > <?php echo strtoupper($row['property_postcode']) ?> <a/> </b>
                       &nbsp; - &nbsp;  
                       <?php echo  date('d M Y', strtotime( $row['term_startdate'])) . " To " . date('d M Y', strtotime( $row['term_enddate']));  ?>
                       &nbsp; - &nbsp;  
@@ -213,7 +214,8 @@ $conn->close();
               <table>
                 <tr>
                   <td>
-                      <b> <?php echo strtoupper($row['property_postcode']) ?> </b>
+                      <b> <a href="main.php?custom=view_agreement1.php?id=<?php echo strtoupper($row['id']) ?>" >
+                         <?php echo strtoupper($row['property_postcode']) ?> </a> </b>
                         &nbsp; - &nbsp;  
                         <?php echo  date('d M Y', strtotime( $row['term_startdate'])) . " To " . date('d M Y', strtotime( $row['term_enddate']));  ?>
                         &nbsp; - &nbsp;  

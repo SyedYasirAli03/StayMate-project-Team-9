@@ -20,12 +20,6 @@ session_start();
     exit;
   }
 
-//Now Check if form is loading for a GET request!
-if ($_SERVER["REQUEST_METHOD"] === "GET") {
-  //Set default data for dates etc.
-  $todayDate = date("Y-m-d");
-}
-
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
   // Connect to the database using constants from db_credentials.php
@@ -36,7 +30,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       die("Connection failed: " . $conn->connect_error);
   }
   
-  echo "POST";
   // Get the JSON data from the request body
   $json_data = file_get_contents('php://input');
 
@@ -47,34 +40,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   //var_dump($data);
 
   // Retrieve form data
-  $landlordName = $data["landlord_name"];
-  $landlordAddress = $data["landlord_address"];
-  $tenantName = $data["tenant_name"];
-  $tenantAddress = $data["tenant_address"];
-  $landlordEmail = $data["landlord_email"];
-  $landlordPhone = $data["landlord_phone"];
-  $tenantEmail = $data["tenant_email"];
-  $tenantPhone = $data["tenant_phone"];
-  $propertyAddress = $data["property_address"];
-  $propertyPostcode = $data["property_postcode"];
-  $termStartDate = $data["term_start_date"];
-  $termEndDate = $data["term_end_date"];
-  $totalRent = $data["total_rent"];
-  $rentPaidOnDay = $data["rent_paid_on_day"];
-  $installmentAmount = $data["installment_amount"];
-  $landlordSign = $data["landlord_sign"];
-  $landlordSignDate = $data["landlord_sign_date"];
-  $tenantSign = $data["tenant_sign"];
-  $tenantSignDate = $data["tenant_sign_date"];
-  $createdBy = $_SESSION['user_id']; // Assuming you have stored the user ID in the session variable
+  $lease_agreement_id=$data["lease_agreement_id"]; 
+  $notes=$data["text"];
+  $entered_by=$data["entered_by"];
+  $createdBy = $_SESSION['user_id']; 
+  /*
+  echo $lease_agreement_id;
+  echo $notes;
+  echo $entered_by;
+  echo $createdBy;
+*/
 
   // Insert data into the lease_agreement table
-  $stmt = $conn->prepare("INSERT INTO lease_agreement (
-      landlord_name, landlord_address, tenant_name, tenanat_address, landlord_email, landlord_phone,
-      tenant_email, tenant_phone, property_address, property_postcode, term_startdate, term_enddate,
-      total_rent, rent_paid_on_day, installment_amount, landlord_sign, landlord_sign_date,
-      tenant_sign, tenant_sign_date, created_by
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+  $stmt = $conn->prepare("INSERT INTO lease_agreement_notes (lease_agreement_id, notes, entered_by, created_by
+  ) VALUES (?, ?, ?, ?)");
 
   // Check if the prepare statement is successful
   if (!$stmt) {
@@ -83,26 +62,41 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   }
 
   $stmt->bind_param(
-      "sssssssssssdidsssssi",
-      $landlordName, $landlordAddress, $tenantName, $tenantAddress, $landlordEmail, $landlordPhone,
-      $tenantEmail, $tenantPhone, $propertyAddress, $propertyPostcode, $termStartDate, $termEndDate,
-      $totalRent, $rentPaidOnDay, $installmentAmount, $landlordSign, $landlordSignDate,
-      $tenantSign, $tenantSignDate, $createdBy
+      "issi",
+     $lease_agreement_id, $notes, $entered_by, $createdBy
   );
 
   if ($stmt->execute()) {
       // Data inserted successfully. 
-      // Let's send an email
-      sendActivationEmail($tenantEmail, $landlordName, $propertyAddress );
-      // You can redirect to a success page or display a success message here
-      echo "<p>Lease Agreement submitted successfully!</p>";
-      echo "<p><a href='dashboard.php'>Click here to go back to dashboard</a></p>";
+      // Retrieve the auto-incremented ID
+      $insertedId = $conn->insert_id;
+      
+       // Prepare JSON response
+        $response = array(
+          'status' => 'success',
+          'message' => 'Lease Agreement submitted successfully!',
+          'insertedId' => $insertedId
+      );
+
+      // Send the JSON response
+      header('Content-Type: application/json');
+      echo json_encode($response);
+
+      // Let's send an email to other party
+//      sendActivationEmail($tenantEmail, $landlordName, $propertyAddress );
+
       exit;
   } else {
-      // Error occurred while inserting data
-      // You can redirect to an error page or display an error message here
-      echo "---Error: " . $stmt->error;
+
+    $response = array(
+      'status' => 'error',
+      'message' => 'Error: ' . $stmt->error);
+
+       // Send the JSON response
+       header('Content-Type: application/json');
+       echo json_encode($response);
   }
+  
 
   // Close the statement
   $stmt->close();

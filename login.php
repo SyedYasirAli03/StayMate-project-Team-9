@@ -136,10 +136,10 @@ ob_start();
             }
 
             // Prepare the query to fetch user data based on email.
-            $stmt = $conn->prepare("SELECT id, name, password, activated FROM users WHERE email = ?");
+            $stmt = $conn->prepare("SELECT id, name, password, activated, email FROM users WHERE email = ?");
             $stmt->bind_param("s", $email);
             $stmt->execute();
-            $stmt->bind_result($userId, $name, $hashedPassword, $activated);
+            $stmt->bind_result($userId, $name, $hashedPassword, $activated, $email);
             $stmt->fetch();
             $stmt->close();
 
@@ -150,6 +150,7 @@ ob_start();
                 $_SESSION['user_id'] = $userId;
                 $_SESSION['name'] = $name;
                 $_SESSION['activated'] = $activated;
+                $_SESSION['email'] = $email;
                 return true;
             } else {
                 return false;

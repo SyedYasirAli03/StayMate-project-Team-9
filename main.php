@@ -15,6 +15,14 @@ session_start();
   // Retrieve user ID and name from session variables.
   $userId = $_SESSION['user_id'];
   $name = $_SESSION['name'];
+  $email = $_SESSION['email'];
+
+  $custom = "main_dashboard.php";
+  if (isset($_GET['custom']) && !empty($_GET['custom'])) {
+    // If the user is not logged in, redirect to the login page.
+    $custom = $_GET['custom'];
+  }
+   
 
 ?>
 
@@ -33,6 +41,8 @@ session_start();
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@mdi/font@3.x/css/materialdesignicons.min.css"
     />
+    <script src="./lib/html2pdf.bundle.js"></script>
+
   </head>
 
 
@@ -47,6 +57,7 @@ session_start();
                 v-for="(item, index) in menuItems"
                 :key="index"
                 @click="loadContent(item.route)"
+                :class="{ 'v-list-item--active': item.route === activeItem }"
               >
                 <v-list-item-icon>
                   <v-icon>{{ item.icon }}</v-icon>
@@ -66,25 +77,6 @@ session_start();
           </template>
         </v-navigation-drawer>
 
-         <!-- Right Drawer for Notifications -->
-        <!-- <v-navigation-drawer color="#E2ECF8" clipped app right>
-          <v-list>
-            <v-list-item-group>
-              <v-list-item
-                v-for="(notification, index) in notifications"
-                :key="index"
-              >
-                <v-list-item-icon>
-                  <v-icon>{{ notification.icon }}</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title>{{ notification.text }}</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list-item-group>
-          </v-list>
-        </v-navigation-drawer> -->
-
         <v-app-bar color="#2A3950" dark clipped-left clipped-right flat app>
           <!-- Add the logo using v-img -->
           <v-img
@@ -99,21 +91,16 @@ session_start();
           <v-spacer></v-spacer>
 
           <!-- Add your label on the top right -->
-          <v-toolbar-title>
-            <span style="color: #fff;"> Welcome <?php echo $name; ?> </span>
+          <v-toolbar-title style="text-align:right;">
+          Welcome <span style="color: #1ee;"> <?php echo $name;  ?> </span> <br />
+            <span style="color: #1ee; font-size: small;">  <?php echo $email;  ?> </span>
           </v-toolbar-title>
         </v-app-bar>
 
         <!-- Main Content -->
         <v-main style="background-color: #325f85">
-          <v-container style="height: 100%; width: 100%; min-height: 100vh;">
-            <iframe
-              v-if="selectedRoute"
-              :src="selectedRoute"
-              frameborder="0"
-              style="width: 100%; height: 100%"
-              scrolling="no"
-            ></iframe>
+          <v-container style="height: 100%; width: 100%;">           
+            <div style="height: 100%; width: 100%" id="appForm"></div>
           </v-container>
         </v-main>
       </v-app>
@@ -137,7 +124,8 @@ session_start();
         return {
           drawerLeft: false,
           drawerRight: false,
-          selectedRoute: "main_dashboard.php", // Default route
+          activeItem: "<?php echo $custom; ?>",
+          selectedRoute: "<?php echo $custom; ?>", // Default route
           menuItems: [
             {
               text: "Dashboard",
@@ -147,7 +135,7 @@ session_start();
             {
               text: "Lease Agreement",
               icon: "mdi-newspaper",
-              route: "lease.php",
+              route: "lease2.php",
             },
             {
               text: "Legal Information",
@@ -176,11 +164,30 @@ session_start();
       methods: {
         loadContent(file) {
           // Update the selectedRoute property
-          this.selectedRoute = file;
+          // this.selectedRoute = file;
+          this.activeItem = file;
+          fetch(file)
+            .then((response) => response.text())
+            .then((html) => {
+              document.getElementById("appForm").innerHTML = html;
+
+              // Execute scripts in the loaded HTML
+              const scripts = document
+                .getElementById("appForm")
+                .querySelectorAll("script");
+              scripts.forEach((script) => {
+                eval(script.innerHTML);
+              });
+            })
+            .catch((error) => {
+              console.error("Error loading file:", error);
+            });
         },
       },
+      mounted() {
+        this.loadContent("<?php echo $custom; ?>");
+      },      
     });
   </script>
 </html>
-
 
