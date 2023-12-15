@@ -143,8 +143,14 @@ session_start();
 </head>
 <body>
 
+
+
+
 <div id="view_agreement">
   <v-container style="background-color: #ffffff;">
+
+  <v-btn  v-if="isLandlord" @click="toggleEditMode" color="primary">{{ editMode ? 'Cancel' : 'Edit' }}</v-btn>
+  <v-btn v-if="isLandlord && editMode" @click="saveChanges" color="primary">Save</v-btn>
 
   <v-row>
     <v-col cols="9">
@@ -169,44 +175,66 @@ session_start();
 			<p  style='margin-bottom:5px;'>This is a lease ("the Lease") between 
 			
       
-      <span v-if="this.isLandlord">
       <v-text-field
-                  outlined
-                  dense
-                  solo
-                  small
-                  v-model="landlord.name"
-                  label="Landlord Name"
-                  :rules="requiredRule"
-                  prepend-inner-icon="mdi-account"
-                  style="max-width: 250px;"
-                ></v-text-field>
-      </span>
-      
-      <span style="text-decoration: underline;"> &nbsp;&nbsp;&nbsp;
-      {{ landlord.name }} &nbsp;&nbsp;&nbsp;</span>
-      
-      
+          v-if="isLandlord && editMode"
+          outlined
+          dense
+          solo
+          small
+          v-model="landlord.name"
+          label="Landlord Name"
+          :rules="requiredRule"
+          prepend-inner-icon="mdi-account"
+          style="max-width: 250px;"
+        ></v-text-field> </span>
+      <span v-else style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{  landlord.name }} &nbsp;&nbsp;&nbsp;</span> 
+
 			 (name & address of owner of the property)
 
-       <span v-if="this.isLandlord">
-        <v-text-field
-                    outlined
-                    dense
-                    solo
-                    small
-                    v-model="landlord.address"
-                    label="Landlord Address"
-                    :rules="requiredRule"
-                    style="max-width: 350px;"
-                  ></v-text-field>
-        </span>
+       <v-text-field
+          v-if="isLandlord && editMode"
+          outlined
+          dense
+          solo
+          small
+          v-model="landlord.address"
+          label="Landlord Address"
+          :rules="requiredRule"
+          style="max-width: 350px;"
+          prepend-inner-icon="mdi-map-marker"
+        ></v-text-field> </span>
+        <span v-else style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{  landlord.address }} &nbsp;&nbsp;&nbsp;</span> 
 
-			 <span style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{ landlord.address }} &nbsp;&nbsp;&nbsp;</span>
-			  UK. (“Landlord”) and <br /> <br />
-			  <span style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{  tenant.name }} &nbsp;&nbsp;&nbsp;</span> 
+        UK. (“Landlord”) and <br /> <br />
+
+
+        <v-text-field
+          v-if="isLandlord && editMode"
+          outlined
+          dense
+          solo
+          small
+          v-model="tenant.name"
+          label="Tenant Name"
+          :rules="requiredRule"
+          style="max-width: 250px;"
+        ></v-text-field> </span>
+        <span v-else style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{  tenant.name }} &nbsp;&nbsp;&nbsp;</span> 
+
 			 (name(s) of person(s) to whom the property is leased) 
-			 <span style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{  tenant.address }} &nbsp;&nbsp;&nbsp;</span> 
+       <v-text-field
+          v-if="isLandlord && editMode"
+          outlined
+          dense
+          solo
+          small
+          v-model="tenant.address"
+          label="Tenant Address"
+          :rules="requiredRule"
+          style="max-width: 350px;"
+          prepend-inner-icon="mdi-map-marker"
+        ></v-text-field> </span>
+        <span v-else style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{  tenant.address }} &nbsp;&nbsp;&nbsp;</span>  
 			 (“Tenant.”)</p>
 			<br />
 		</v-col>
@@ -214,25 +242,105 @@ session_start();
 	<v-row>
         <v-col>
           <p style='margin-bottom:15px;'><strong>Landlord’s E-mail:</strong> 
-            <span style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{ landlord.email }} &nbsp;&nbsp;&nbsp;</span>
-          </p>
+
+
+          <v-text-field
+                  v-if="isLandlord && editMode"
+                  outlined
+                  dense
+                  solo
+                  small
+                  v-model="landlord.email"
+                  label="Landlord Email"
+                  :rules="[requiredRule, emailRule]"
+                  prepend-inner-icon="mdi-email"
+                ></v-text-field>  </span>
+          <span v-else style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{  landlord.email }} &nbsp;&nbsp;&nbsp;</span> 
+
+        </p>
           <p><strong>Tenant’s E-mail:</strong> 
-            <span style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{ tenant.email }} &nbsp;&nbsp;&nbsp;</span>
+
+              <v-text-field
+                      v-if="isLandlord && editMode"
+                      outlined
+                      dense
+                      solo
+                      small
+                      v-model="tenant.email"
+                      label="Tenant Email"
+                      :rules="[requiredRule, emailRule]"
+                      prepend-inner-icon="mdi-email"
+                    ></v-text-field>  </span>
+              <span v-else style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{  tenant.email }} &nbsp;&nbsp;&nbsp;</span> 
+
           </p>
         </v-col>
         <v-col>
-          <p style='margin-bottom:15px;'><strong>Landlord’s Telephone:</strong> {{ landlord.phoneNumber }}</p>
 
-          <p><strong>Tenant’s Telephone:</strong> {{ tenant.phoneNumber }}</p>
+          <p style='margin-bottom:15px;'><strong>Landlord’s Telephone:</strong> 
+          
+          <v-text-field
+                  v-if="isLandlord && editMode"
+                  outlined
+                  dense
+                  solo
+                  small
+                  v-model="landlord.phoneNumber"
+                  label="Landlord Phone"
+                  :rules="[requiredRule, phoneRule]"
+                  prepend-inner-icon="mdi-phone"
+                ></v-text-field> </span>          
+          <span v-else style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{  landlord.phoneNumber }} &nbsp;&nbsp;&nbsp;</span> 
+
+
+          <p><strong>Tenant’s Telephone:</strong> 
+            <v-text-field
+                    v-if="isLandlord && editMode"
+                    outlined
+                    dense
+                    solo
+                    small
+                    v-model="tenant.phoneNumber"
+                    label="Tenant Phone"
+                    :rules="[requiredRule, phoneRule]"
+                    prepend-inner-icon="mdi-phone"
+                  ></v-text-field> </span>          
+            <span v-else style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{  tenant.phoneNumber }} &nbsp;&nbsp;&nbsp;</span>         
+          </p>
         </v-col>
     </v-row>
     <v-row>
       <v-col>
         <h3 style='margin-bottom:5px;'>2. PROPERTY RENTED</h3>
         <p>Landlord leases to Tenant the land and buildings located at 
-        <span style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{ property.address }} &nbsp;&nbsp;&nbsp;</span>
+            <v-text-field
+              v-if="isLandlord && editMode"
+              outlined
+              dense
+              solo
+              small
+              v-model="property.address"
+              label="Property Address"
+              :rules="requiredRule"
+              prepend-inner-icon="mdi-home"
+            ></v-text-field> </span>
+            <span v-else style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{ property.address }} &nbsp;&nbsp;&nbsp;</span>
+
+
          (street address), stoke 
-        <span style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{ property.postCode }} &nbsp;&nbsp;&nbsp;</span>
+
+            <v-text-field
+              v-if="isLandlord && editMode"
+              outlined
+              dense
+              solo
+              small
+              v-model="property.postCode"
+              label="Property Postcode"
+              :rules="requiredRule"
+              prepend-inner-icon="mdi-map-marker"
+            ></v-text-field>
+        <span v-else style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{ property.postCode }} &nbsp;&nbsp;&nbsp;</span>
          (post code)</p>
       </v-col>
     </v-row>
@@ -240,10 +348,63 @@ session_start();
     <v-row>
       <v-col>
         <h3 style='margin-bottom:5px;'>3. TERM</h3>
-        <p>This is a lease for a term, not to exceed twelve months, beginning on 
-        <span style="text-decoration: underline;"> &nbsp;&nbsp;&nbsp; {{ leaseTerm.startDate }} &nbsp;&nbsp;&nbsp;</span>  (month, day, year)
+        <p>This is a lease for a term, not to exceed twelve months, beginning on </p>
+
+            <v-menu
+              v-if="isLandlord && editMode"
+              ref="termStartDateMenu"
+              v-model="termStartDateMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+            >
+              <template v-slot:activator="{ on }">
+                <v-text-field
+                  class="pt-2"
+                  outlined
+                  dense
+                  solo
+                  v-model="leaseTerm.startDateFormat"
+                  label="Term Start Date"
+                  readonly
+                  v-on="on"
+                  prepend-inner-icon="mdi-calendar"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="leaseTerm.startDateFormat"
+                @input="termStartDateMenu = false"
+              ></v-date-picker>
+            </v-menu>
+        <span v-else style="text-decoration: underline;"> &nbsp;&nbsp;&nbsp; {{ leaseTerm.startDate }} &nbsp;&nbsp;&nbsp;</span>  (month, day, year)
          and ending  
-         <span style="text-decoration: underline;"> &nbsp;&nbsp;&nbsp; {{ leaseTerm.endDate }} 
+              <v-menu
+              v-if="isLandlord && editMode"
+              ref="termEndDateMenu"
+              v-model="termEndDateMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+            >
+              <template v-slot:activator="{ on }">
+                <v-text-field
+                  class="pt-2"
+                  outlined
+                  dense
+                  solo
+                  v-model="leaseTerm.endDateFormat"
+                  label="Term End Date"
+                  readonly
+                  v-on="on"
+                  prepend-inner-icon="mdi-calendar"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="leaseTerm.endDateFormat"
+                @input="termEndDateMenu = false"
+              ></v-date-picker>
+            </v-menu>
+            <span v-else style="text-decoration: underline;"> &nbsp;&nbsp;&nbsp; {{ leaseTerm.endDate }} 
          &nbsp;&nbsp;&nbsp;</span> (month, day, year) (the "Lease Term").</p>
       </v-col>
     </v-row>
@@ -252,15 +413,53 @@ session_start();
       <v-col>
         <h3 style='margin-bottom:5px;'>4. RENT PAYMENTS, TAXES AND CHARGES</h3>
         <p style='margin-bottom:15px;'>Tenant shall pay total rent in the amount of £
-        <span style="text-decoration: underline;"> &nbsp;&nbsp;&nbsp;  {{ rentDetails.amount }}
-         &nbsp;&nbsp;&nbsp;</span>
-          (excluding taxes) for the Lease Term.</p>
+              <v-text-field
+                v-if="isLandlord && editMode"
+                outlined
+                dense
+                solo
+                v-model="rentDetails.amount"
+                label="Total Rent"
+                :rules="[requiredRule, numericRule]"
+                prepend-inner-icon="mdi-cash"
+              >
+              </v-text-field>
+              <span v-else style="text-decoration: underline;"> &nbsp;&nbsp;&nbsp; {{ rentDetails.amount }}
+                &nbsp;&nbsp;&nbsp;</span>
+
+          (excluding taxes) for the Lease Term.
+        </p>
+        
+        
         <p style='margin-bottom:15px;'>The rent shall be payable by Tenant in advance in installments or in full as provided in the options below:</p>
         <p v-if="rentDetails.installments">If in installments, rent shall be payable monthly, on the 
-        <span style="text-decoration: underline;"> &nbsp;&nbsp;&nbsp; {{ rentDetails.dayOfMonth || 'first' }} 
+        
+        
+        <v-text-field
+          v-if="isLandlord && editMode"
+          outlined
+          dense
+          solo
+          v-model="rentDetails.dayOfMonth"
+          label="Rent Paid On Day"
+          :rules="[requiredRule, numericRule]"
+          prepend-inner-icon="mdi-cash"
+        > </v-text-field>
+        <span v-else style="text-decoration: underline;"> &nbsp;&nbsp;&nbsp; {{ rentDetails.dayOfMonth || 'first' }} 
          &nbsp;&nbsp;&nbsp;</span>         
         day of each month in the amount of £ 
-        <span style="text-decoration: underline;"> &nbsp;&nbsp;&nbsp; {{ rentDetails.installmentAmount }} 
+
+        <v-text-field
+          v-if="isLandlord && editMode"
+          outlined
+          dense
+          solo
+          v-model="rentDetails.installmentAmount"
+          label="Installment Amount"
+          :rules="[requiredRule, numericRule]"
+          prepend-inner-icon="mdi-cash"
+        ></v-text-field>
+        <span v-else style="text-decoration: underline;"> &nbsp;&nbsp;&nbsp; {{ rentDetails.installmentAmount }} 
          &nbsp;&nbsp;&nbsp;</span> 
         per installment.</p>
       </v-col>
@@ -271,22 +470,6 @@ session_start();
         <v-col>
           <p style='margin-bottom:10px; margin-top:45px;'>The Lease has been executed by the parties on the dates indicated below.</p>
           </v-col>
-    </v-row>
-        
-    <v-row>
-        <v-col>
-          <p style='margin-bottom:15px;'><strong>{{ landlord.name }}</strong> 
-            <span style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{ landlord.email }} &nbsp;&nbsp;&nbsp;</span>
-          </p>
-          <p style="text-decoration:center;"><strong>Landord's Signature</strong> 
-            <span style="text-decoration: underline; "> &nbsp;&nbsp;&nbsp; {{ tenant.email }} &nbsp;&nbsp;&nbsp;</span>
-          </p>
-        </v-col>
-        <v-col>
-          <p style='margin-bottom:15px;'><strong>Landlord’s Telephone:</strong> {{ landlord.phoneNumber }}</p>
-
-          <p><strong>Tenant’s Telephone:</strong> {{ tenant.phoneNumber }}</p>
-        </v-col>
     </v-row>
 
     <v-row>
@@ -344,8 +527,10 @@ session_start();
     el: '#view_agreement',
     vuetify: new Vuetify(),
     data: {
+      editMode: false,
       currentUserType:"<?php echo $userType; ?>",
       isLandlord:"<?php echo $isLandlord == 0 ? false : true; ?>",
+      id:<?php echo $result["id"]; ?>,
       comments: [
 
         <?php 
@@ -374,16 +559,21 @@ session_start();
       },
       leaseTerm: {
         startDate: "<?php echo date('d M Y', strtotime( $result['term_startdate'])) ; ?>",
+        startDateFormat : "<?php echo date('Y-m-d', strtotime( $result['term_startdate'])) ; ?>",
         endDate: "<?php echo date('d M Y', strtotime( $result['term_enddate'])) ; ?>",
+        endDateFormat : "<?php echo date('Y-m-d', strtotime( $result['term_enddate'])) ; ?>",
       },
       rentDetails: {
-        amount: "<?php echo $result['property_postcode']; ?>",
+        amount: "<?php echo $result['total_rent']; ?>",
         installments: true,
-        dayOfMonth: "<?php echo $result['property_postcode']; ?>",
-        installmentAmount: "<?php echo $result['property_postcode']; ?>",
+        dayOfMonth: "<?php echo $result['rent_paid_on_day']; ?>",
+        installmentAmount: "<?php echo $result['installment_amount']; ?>",
       }
     },
       methods: {
+        toggleEditMode() {
+          this.editMode = !this.editMode;
+        },
 
         exportToPDF() {
           setTimeout(() => {
@@ -425,7 +615,6 @@ session_start();
 
             
             if (response.ok) {
-              debugger
 
               const responseData = await response.json();
 
@@ -449,7 +638,51 @@ session_start();
               console.error('Error adding comment');
             }
           }
-        }
+        },
+
+        async saveChanges() {
+          // Perform the logic to save changes to the server using PHP
+          const response = await fetch('saveAgreement.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              lease_agreement_id: <?php echo $lease_agreement_id; ?>,
+              landlord_name: this.landlord.name,
+              landlord_address: this.landlord.address,
+              landlord_email: this.landlord.email,
+              landlord_phone: this.landlord.phoneNumber,
+              tenant_name: this.tenant.name,
+              tenant_address: this.tenant.address,
+              tenant_email : this.tenant.email,
+              tenant_phone: this.tenant.phoneNumber,
+              property_address : this.property.address,
+              property_postcode : this.property.postCode,
+              term_startdate : this.leaseTerm.startDateFormat,
+              term_enddate : this.leaseTerm.endDateFormat,
+              total_rent : this.rentDetails.amount,
+              rent_paid_on_day : this.rentDetails.dayOfMonth,
+              installment_amount : this.rentDetails.installmentAmount,
+            }),
+          });
+
+          if (response.ok) {
+            debugger
+            const responseData = await response.json();
+            if (responseData.status === 'success') {
+              // Handle success, e.g., show a confirmation message
+              console.log('Changes saved successfully');
+              // Disable edit mode after saving
+              this.editMode = false;
+            } else {
+              // Handle the error case
+              console.error('Error saving changes:', responseData.message);
+            }
+          } else {
+            console.error('Error saving changes');
+          }
+        },
       },
     });
 </script>

@@ -27,6 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+  //error_log("Request received in saveAgreement.php"); 
 
   // Connect to the database using constants from db_credentials.php
   $conn = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
@@ -36,9 +37,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       die("Connection failed: " . $conn->connect_error);
   }
   
-  echo "POST";
+  //echo "POST";
   // Get the JSON data from the request body
   $json_data = file_get_contents('php://input');
+  //error_log($json_data);
 
   //var_dump($json_data);
 
@@ -82,13 +84,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       die('Error in preparing the statement: ' . $conn->error);
   }
 
+  
   $stmt->bind_param(
-      "sssssssssssdidsssssi",
-      $landlordName, $landlordAddress, $tenantName, $tenantAddress, $landlordEmail, $landlordPhone,
-      $tenantEmail, $tenantPhone, $propertyAddress, $propertyPostcode, $termStartDate, $termEndDate,
-      $totalRent, $rentPaidOnDay, $installmentAmount, $landlordSign, $landlordSignDate,
-      $tenantSign, $tenantSignDate, $createdBy
+      "ssssssssssssdiiisdsi",
+      $landlordName,        // s: string
+      $landlordAddress,     // s: string
+      $tenantName,          // s: string
+      $tenantAddress,       // s: string
+      $landlordEmail,       // s: string
+      $landlordPhone,       // s: string
+      $tenantEmail,         // s: string
+      $tenantPhone,         // s: string
+      $propertyAddress,     // s: string
+      $propertyPostcode,    // s: string
+      $termStartDate,       // s: string
+      $termEndDate,         // s: string
+      $totalRent,           // d: double
+      $rentPaidOnDay,       // i: integer
+      $installmentAmount,   // i: integer
+      $landlordSign,        // i: integer
+      $landlordSignDate,    // s: string
+      $tenantSign,          // d: double
+      $tenantSignDate,      // s: string
+      $createdBy            // i: integer
   );
+
 
   if ($stmt->execute()) {
       // Data inserted successfully. 

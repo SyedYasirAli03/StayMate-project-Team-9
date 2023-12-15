@@ -15,6 +15,7 @@ session_start();
   // Retrieve user ID and name from session variables.
   $userId = $_SESSION['user_id'];
   $name = $_SESSION['name'];
+  $email = $_SESSION['email'];
 
     // All good, now code will proceed!
 
@@ -442,9 +443,9 @@ session_start();
             termStartDateMenu: false,
             termEndDateMenu: false,
             newAgreement: {
-              landlord_name: "landlord name",
+              landlord_name: "<?php echo $name;?>",
               landlord_address: "landlord address",
-              landlord_email: "landlord@email.com",
+              landlord_email: "<?php echo $email;?>",
               landlord_phone: "07746474647",
               landlord_sign: "aaa",
               landlord_sign_date: "",
