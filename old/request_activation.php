@@ -48,7 +48,7 @@ function sendActivationEmail($email) {
 		//$mail->SMTPSecure = 'tls';
         //$mail->Port       = 587;
         $mail->Username   = 'yasir@trainings4u.com';                     //SMTP username
-		$mail->Password   =  INFO_EMAIL_PW;                               //SMTP password
+		$mail->Password   =  //Type your password;                               //SMTP password
 		$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
 		$mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
         

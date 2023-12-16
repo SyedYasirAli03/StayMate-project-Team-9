@@ -17,8 +17,6 @@ session_start();
 // Function to send account activation email.
 function sendActivationEmail($email) {
     
-	//$baseURL = "http://www.technochannels.com/careers/activate.php?email=";
-	//$baseURL = "https://lgdsindh.gov.pk/slgb/jobsslgb/activate.php?email=";
 	
 	// Get the current server location
     $baseURL = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];

@@ -31,10 +31,10 @@ function sendPasswordEmail($email, $newPassword) {
     try {
         // Server settings
         $mail->isSMTP(); // Send using SMTP
-        $mail->Host       = 'mail.lgdsindh.gov.pk';                     //Set the SMTP server to send through
+        $mail->Host       = '';                     //Set the SMTP server to send through
 		$mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-		$mail->Username   = 'info@lgdsindh.gov.pk';                     //SMTP username
-		$mail->Password   =  INFO_EMAIL_PW;                               //SMTP password
+		$mail->Username   = '';                     //SMTP username
+		$mail->Password   =  ;                               //SMTP password
 		$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
 		$mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 
@@ -45,7 +45,7 @@ function sendPasswordEmail($email, $newPassword) {
 		
 		//Content
 		$mail->isHTML(true);                                  //Set email format to HTML
-		$mail->Subject = 'Your Password - Local Government Department, Government of Sindh';
+		$mail->Subject = '';
 		$mail->Body    = $message;
 		$mail->AltBody = $message ;
 
